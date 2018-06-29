@@ -2,8 +2,17 @@
 
 mkdir -p saved_models
 
-CUDA_VISIBLE_DEVICES=2 python3  src/train.py  --num_epochs=200 --word_dim=50
+#CUDA_VISIBLE_DEVICES=2 python3  src/train.py  --num_epochs=200 --word_dim=50 --test
 # python src/train.py  --num_epochs=200 --word_dim=50 --test
+CUDA_VISIBLE_DEVICES=2 python3  src/train.py  --num_epochs=200 --word_dim=50 --train_file="data/train.2" --train_record="data/train.2.tfrecord" --test --results_file="data/results/result_2.txt"
+CUDA_VISIBLE_DEVICES=2 python3  src/train.py  --num_epochs=200 --word_dim=50 --train_file="data/train.1" --train_record="data/train.1.tfrecord" --test --results_file="data/results/result_1.txt"
+CUDA_VISIBLE_DEVICES=2 python3  src/train.py  --num_epochs=200 --word_dim=50 --train_file="data/train.3" --train_record="data/train.3.tfrecord" --test --results_file="data/results/result_3.txt"
+CUDA_VISIBLE_DEVICES=2 python3  src/train.py  --num_epochs=200 --word_dim=50 --train_file="data/train.4" --train_record="data/train.4.tfrecord" --test --results_file="data/results/result_4.txt"
+CUDA_VISIBLE_DEVICES=2 python3  src/train.py  --num_epochs=200 --word_dim=50 --train_file="data/train.5" --train_record="data/train.5.tfrecord" --test --results_file="data/results/result_5.txt"
+CUDA_VISIBLE_DEVICES=2 python3  src/train.py  --num_epochs=200 --word_dim=50 --train_file="data/train.6" --train_record="data/train.6.tfrecord" --test --results_file="data/results/result_6.txt"
+CUDA_VISIBLE_DEVICES=2 python3  src/train.py  --num_epochs=200 --word_dim=50 --train_file="data/train.7" --train_record="data/train.7.tfrecord" --test --results_file="data/results/result_7.txt"
+CUDA_VISIBLE_DEVICES=2 python3  src/train.py  --num_epochs=200 --word_dim=50 --train_file="data/train.8" --train_record="data/train.8.tfrecord" --test --results_file="data/results/result_8.txt"
+CUDA_VISIBLE_DEVICES=2 python3  src/train.py  --num_epochs=200 --word_dim=50 --train_file="data/train.9" --train_record="data/train.9.tfrecord" --test --results_file="data/results/result_9.txt"
 # src/scorer.pl data/results.txt data/test_keys.txt 
 
 # python src/train.py  --num_epochs=200 --word_dim=300

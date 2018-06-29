@@ -14,7 +14,7 @@ PositionPair = namedtuple('PosPair', 'first last')
 FLAGS = tf.app.flags.FLAGS # load FLAGS.word_dim
 
 def load_raw_data(filename):
-  '''load raw data from text file, 
+  '''load raw data from text file,
 
   return: a list of Raw_Example
   '''
@@ -22,7 +22,7 @@ def load_raw_data(filename):
   with open(filename) as f:
     for line in f:
       words = line.strip().split(' ')
-      
+
       sent = words[5:]
       n = len(sent)
       if FLAGS.max_len < n:
@@ -68,10 +68,10 @@ def _load_embedding(embed_file, words_file):
   words = _load_vocab(words_file)
   for id, w in enumerate(words):
     words2id[w] = id
-  
+
   return embed, words2id
 
-def maybe_trim_embeddings(vocab_file, 
+def maybe_trim_embeddings(vocab_file,
                         pretrain_embed_file,
                         pretrain_words_file,
                         trimed_embed_file):
@@ -101,8 +101,8 @@ def maybe_trim_embeddings(vocab_file,
 
     word_embed = np.asarray(word_embed)
     np.save(trimed_embed_file, word_embed.astype(np.float32))
-    
-  
+
+
   word_embed, vocab2id = _load_embedding(trimed_embed_file, vocab_file)
   return word_embed, vocab2id
 
@@ -132,15 +132,15 @@ def _lexical_feature(raw_example):
       context.append(sent[e_idx-1])
     else:
       context.append(sent[e_idx])
-    
+
     if e_idx < len(sent)-1:
       context.append(sent[e_idx+1])
     else:
       context.append(sent[e_idx])
-    
+
     return context
 
-    
+
   e1_idx = raw_example.entity1.first
   e2_idx = raw_example.entity2.first
 
@@ -161,7 +161,7 @@ def _position_feature(raw_example):
       return 0
     elif n >= -60 and n <= 60:
       return n + 61
-    
+
     return 122
 
   e1_idx = raw_example.entity1.first
@@ -173,7 +173,7 @@ def _position_feature(raw_example):
   for i in range(length):
     position1.append(distance(i-e1_idx))
     position2.append(distance(i-e2_idx))
-  
+
   return position1, position2
 
 def build_sequence_example(raw_example):
@@ -181,7 +181,7 @@ def build_sequence_example(raw_example):
   context features : lexical, rid, direction (mtl)
   sequence features: sentence, position1, position2
 
-  Args: 
+  Args:
     raw_example : type Raw_Example
 
   Returns:
@@ -198,7 +198,7 @@ def build_sequence_example(raw_example):
   for word_id in raw_example.sentence:
     word = ex.feature_lists.feature_list['sentence'].feature.add()
     word.int64_list.value.append(word_id)
-  
+
   position1, position2 = _position_feature(raw_example)
   for pos_val in position1:
     pos = ex.feature_lists.feature_list['position1'].feature.add()
@@ -210,7 +210,7 @@ def build_sequence_example(raw_example):
   return ex
 
 def maybe_write_tfrecord(raw_data, filename):
-  '''if the destination file is not exist on disk, convert the raw_data to 
+  '''if the destination file is not exist on disk, convert the raw_data to
   tf.trian.SequenceExample and write to file.
 
   Args:
@@ -258,11 +258,11 @@ def read_tfrecord_to_batch(filename, epoch, batch_size, pad_value, shuffle=True)
   with tf.device('/cpu:0'):
     dataset = tf.data.TFRecordDataset([filename])
     # Parse the record into tensors
-    dataset = dataset.map(_parse_tfexample) 
+    dataset = dataset.map(_parse_tfexample)
     dataset = dataset.repeat(epoch)
     if shuffle:
       dataset = dataset.shuffle(buffer_size=100)
-    
+
     # [] for no padding, [None] for padding to maximum length
     # n = FLAGS.max_len
     # if FLAGS.model == 'mtl':
@@ -275,7 +275,7 @@ def read_tfrecord_to_batch(filename, epoch, batch_size, pad_value, shuffle=True)
     # dataset = dataset.padded_batch(batch_size, padded_shapes,
     #                                padding_values=pad_value)
     dataset = dataset.batch(batch_size)
-    
+
     iterator = dataset.make_one_shot_iterator()
     batch = iterator.get_next()
     return batch
@@ -307,19 +307,19 @@ def inputs():
   # convert raw data to TFRecord format data, and write to file
   train_record = FLAGS.train_record
   test_record = FLAGS.test_record
-  
+
   maybe_write_tfrecord(raw_train_data, train_record)
   maybe_write_tfrecord(raw_test_data, test_record)
 
   pad_value = vocab2id[PAD_WORD]
-  train_data = read_tfrecord_to_batch(train_record, 
-                              FLAGS.num_epochs, FLAGS.batch_size, 
+  train_data = read_tfrecord_to_batch(train_record,
+                              FLAGS.num_epochs, FLAGS.batch_size,
                               pad_value, shuffle=True)
-  test_data = read_tfrecord_to_batch(test_record, 
-                              FLAGS.num_epochs, 2717, 
+  test_data = read_tfrecord_to_batch(test_record,
+                              FLAGS.num_epochs, 2717,
                               pad_value, shuffle=False)
 
-  return train_data, test_data, word_embed
+  return train_data, test_data, word_embed, len(raw_train_data)
 
 def write_results(predictions, relations_file, results_file):
   relations = []
@@ -327,7 +327,7 @@ def write_results(predictions, relations_file, results_file):
     for line in f:
       segment = line.strip().split()
       relations.append(segment[1])
-  
+
   start_no = 8001
   with open(results_file, 'w') as f:
     for idx, id in enumerate(predictions):
